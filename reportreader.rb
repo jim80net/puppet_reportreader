@@ -152,7 +152,7 @@ end # close do_nothing
 			@@string = ""
 			aResource.each { |v| 
 				if v[1].change_count > 0 and v[1].resource_type !=  "Notify"
-				@@string << %Q[\n\tName: #{v[0]} ]
+				@@string << %Q[\n\t#{v[0]} ]
 				# Not included attributes: 
 					# title
 					# resource_type
@@ -186,7 +186,7 @@ end # close do_nothing
     ob2.each {|v| 
 			string = extract_resource_statuses(v[:resource_statuses]) if v[:resource_statuses]
 			puts(
-				%Q[\nReport: #{v[:host]}  #{v[:time]}  #{v[:status]}  #{string} \nLogs:\n#{v[:logs]}]
+				%Q[\nReport: #{v[:host]}  #{v[:time]}  #{v[:status]}  #{string} ]
 			) if v[:status] == "changed" and  string != ""
 		} ##{v[:kind]} #{v[:logs]}
   end # def print_host_changes( aHostname, anArr ) 
