@@ -1,0 +1,16 @@
+reportreader.rb
+ - This tool was created because a google search for CLI report reader returned: nada. 
+ - reportreader.rb is useful for creating crontabs that report on changes made in a certain time period. 
+ - I have mine set to report hourly on changes that occur in the infrastructure. 
+ - Eventually, I may come to rely on something like Dashboard or Foreman, but for now, this meets my requirements. 
+
+Usage: puppet_tools/reportreader.rb [options]
+    -t, --time PARAM                 Time scope by hours from now: default is 12
+    -s, --hostname PARAM             Identify hostname to check
+    -c, --changes                    Print changed resources
+    -l, --logs                       Print logs from changed resources
+    -v, --verbose                    Increase verbosity
+    -f, --reportdir PARAM            Identify reports directory (default: /var/lib/puppet/reports)
+    -h, --help                       Display this screen
+jim@netops2s:~/opt$ 
+
