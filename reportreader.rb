@@ -104,7 +104,6 @@ end # def process_files( aDir )
 def read_reports( fileList , hours=12)
 	arr = []
 	fileList.each { |f|
-		
 		if (Time.now - (hours*60*60)).gmtime.strftime("%Y%m%d%H%M") <  f[/[0-9]{12}.yaml/]
 			File.open(f) { |g|
 				if b = YAML.load(g) then
@@ -120,14 +119,12 @@ def read_reports( fileList , hours=12)
 						:time => b.time,
 
 						# :raw => b, # <-- This makes for some fairly large memory usage
-					}
+					} # hsh = {
 					arr.push(hsh)
-				end # if b = 
-			} # File.open
-		end # if Time.now
-
-	#	} # Thread.new
-	} # fileList.each
+				end # if b = YAML.load(g) then
+			} # File.open(f) { |g|
+		end # if (Time.now - (hours*60*60)).gmtime.strftime("%Y%m%d%H%M") <  f[/[0-9]{12}.yaml/]
+	} # fileList.each { |f|
 
 	return arr
 
