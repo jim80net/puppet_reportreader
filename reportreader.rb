@@ -98,37 +98,42 @@ def process_files( aDir )
 	} # Find.find( aDir ) { |f|
 
 	directories = @@directories[1..@@directories.length].sort
-	return @@files,directories
+	files = @@files.sort
+	return files,directories
 end # def process_files( aDir )
 
-def read_reports( fileList , hours=12)
+
+def filter_by_time( fileList, hours=12 )
 	arr = []
 	fileList.each { |f|
 		if (Time.now - (hours*60*60)).gmtime.strftime("%Y%m%d%H%M") <  f[/[0-9]{12}.yaml/]
-			File.open(f) { |g|
-				if b = YAML.load(g) then
-					hsh = {
-						:filename => f,
-						:configuration_version => b.configuration_version,
-						:host => b.host,
-						:kind => b.kind,
-						:logs => b.logs,
-						:metrics => b.metrics,
-						:resource_statuses => b.resource_statuses,
-						:status => b.status,
-						:time => b.time,
-
-						# :raw => b, # <-- This makes for some fairly large memory usage
-					} # hsh = {
-					arr.push(hsh)
-				end # if b = YAML.load(g) then
-			} # File.open(f) { |g|
+			arr.push(f)
 		end # if (Time.now - (hours*60*60)).gmtime.strftime("%Y%m%d%H%M") <  f[/[0-9]{12}.yaml/]
-	} # fileList.each { |f|
+	} #fileList.each { |f|
+	arr2 = arr.sort { |x,y| y <=> x } # reverse sort puts present on top of past, though this means hostnames are backwards as well. 
+	return arr2
+end # def filter_by_time( fileList, hours=12 )
 
-	return arr
 
-end # def read_reports( fileList )
+def read_report( fileList )
+	File.open(fileList) { |g|
+		if b = YAML.load(g) then
+			@@hsh = {
+				:configuration_version => b.configuration_version,
+				:host => b.host,
+				:kind => b.kind,
+				:logs => b.logs,
+				:metrics => b.metrics,
+				:resource_statuses => b.resource_statuses,
+				:status => b.status,
+				:time => b.time,
+			} # hsh = {
+		end # if b = YAML.load(g) then
+	} # File.open(f) { |g|
+
+	return @@hsh
+
+end # def read_report( fileList )
 
 #    PRE PROCESSING     #
 #########################
@@ -181,14 +186,13 @@ end # def extract_resource_statuses( resObj )
 
 def print_host_changes( anArr )
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
-	ob = anArr.sort_by { |v| v[:time] }
-	ob2 = ob.sort_by {|v| v[:host] }
-	ob2.each {|v| 
-		string = extract_resource_statuses(v[:resource_statuses]) if v[:resource_statuses]
-		puts(
-			%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
-		) if (v[:status] == "changed" and  string != "") or (v[:status] == "failed")
-	} ##{v[:kind]} #{v[:logs]}
+	anArr.each {|w| 
+		v = read_report(w) 
+			string = extract_resource_statuses(v[:resource_statuses]) if v[:resource_statuses]
+			puts(
+				%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
+			) if (v[:status] == "changed" and  string != "") or (v[:status] == "failed")
+	} # anArr.each {|w| 
 end # def print_host_changes( aHostname, anArr ) 
 
 
@@ -267,10 +271,23 @@ begin # main rescue block
 	end # options:hostname rescue block
 
 
-	print("Reading reports:...")  if options[:verbose]
-		a = read_reports(checkedList) if options[:hours] == nil # and options[:verbose] == nil
-		a = read_reports(checkedList, options[:hours]) if options[:hours] # and options[:verbose] == nil
-	print("done. Loaded #{a.length} records.\n") if options[:verbose]
+	begin # filter by hours rescue block
+		if options[:hours] == nil
+			print("How many hours ago shall we check?:")
+			ans = gets().chomp()
+			if !(ans[/[0-9]+/]) then raise end
+		else
+			ans = options[:hours]
+		end # if options[:hours] == nil
+	
+		a = filter_by_time(checkedList,ans.to_f) 
+		puts("Found #{a.length} reports.") if options[:verbose]
+
+		rescue
+			puts "Error with time."
+			retry
+
+	end # filter by hours rescue block
 
 	
 	begin # options:changes rescue block
