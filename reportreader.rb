@@ -143,12 +143,10 @@ end # def read_report( fileList )
 #    OUTPUTS    #
 
 def extract_resource_statuses( resObj )
-	aResource=[]
-	resObj.each { |v| aResource.push(v)  }
-	# aResource[n] {|v| [0] = name ; [1] = Puppet::Resource::Status }
 	# http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Resource/Status
+	# aResource[n] {|v| [0] = name ; [1] = Puppet::Resource::Status }
 	@@string = ""
-	aResource.each { |v| 
+	resObj.each { |v| 
 		if (v[1].change_count > 0 and v[1].resource != "Notify[environment_notice]") or (v[1].failed)
 			@@string << %Q[\n\t#{v[0]} ]
 
@@ -184,6 +182,21 @@ def extract_resource_statuses( resObj )
 	return @@string
 end # def extract_resource_statuses( resObj )
 
+
+def extract_logs(logs)
+	@@string = ""
+	logs.each { |v|
+		case v.level
+			when (:info or :notice or :warning or :err or :alert or :emerg or :crit)
+				@@string << "\n\t" + v.time.to_s + ": " + v.message 
+			else # /:debug/ or /:info/ 
+				do_nothing
+		end #case v.level
+	}
+	return @@string
+end # def extract_logs(logs)
+
+
 def print_host_changes( anArr )
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
 	anArr.each {|w| 
@@ -198,13 +211,12 @@ end # def print_host_changes( aHostname, anArr )
 
 def print_host_logs( anArr )
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
-	ob = anArr.sort_by { |v| v[:time] }
-	ob2 = ob.sort_by {|v| v[:host] }
-	ob2.each {|v| 
-		if v[:status] == "changed"
-			puts(%Q[\nReport: #{v[:host]}  #{v[:time]}  #{v[:status]} ] )
-			puts(%Q[\t#{v[:logs]}])
-		end
+	anArr.each {|w| 
+		v = read_report(w)
+			string = extract_logs(v[:logs]) if v[:logs]
+			puts(
+				%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
+			) if (v[:status] == "changed" and  string != "") or (v[:status] == "failed")
 	}
 end # def print_host_logs( anArr ) 
 
@@ -286,16 +298,15 @@ begin # main rescue block
 		rescue
 			puts "Error with time."
 			retry
-
 	end # filter by hours rescue block
 
 	
 	begin # options:changes rescue block
 		if !(options[:changes] or options[:logs])
 			puts("What information do you want?")
-			print("\n c: Print host changes.")
-			print("\n l: Print host logs.")
-			print("\n q: exit from this menu.\n")
+			print("\n\tc: Print host changes.")
+			print("\n\tl: Print host logs.")
+			print("\n\tq: exit from this menu.\n")
 			print("Enter your selection:")
 			ans = gets().chomp()
 			case ans
