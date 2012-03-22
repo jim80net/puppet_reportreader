@@ -145,6 +145,19 @@ end # def read_report( fileList )
 def extract_resource_statuses( resObj )
 	# http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Resource/Status
 	# aResource[n] {|v| [0] = name ; [1] = Puppet::Resource::Status }
+	def extract_events(events)
+		@@event = ""
+		events.each { |y|
+			@@event << %Q[\n\t\t\t#{y.name}]
+			@@event << %Q[\n\t\t\t#{y.property}]
+			@@event << %Q[\n\t\t\t#{y.message}]
+			@@event << %Q[\n\t\t\tPrevious value: #{y.previous_value}]
+			@@event << %Q[\n\t\t\tDesired value: #{y.previous_value}]
+			@@event << %Q[\n\t\t\t#{y.status}]
+		} # v[1].events.each { |y|
+		return @@event
+	end # def extract_events(events)
+
 	@@string = ""
 	resObj.each { |v| 
 		if (v[1].change_count > 0 and v[1].resource != "Notify[environment_notice]") or (v[1].failed)
@@ -156,28 +169,39 @@ def extract_resource_statuses( resObj )
 			# change_count
 			# out_of_sync_count
 			# changed
-			%W[
-				resource
-				failed
-				events
-	
-				time
-				evaluation_time
-				file
-				line
-	
-				status
-				current_values
-				default_log_level
-				node
-				source_description
-	
-				skipped
+			if $verbose
+				resources = %W[
+					resource
+					failed
+		
+					time
+					evaluation_time
+					file
+					line
+		
+					status
+					current_values
+					default_log_level
+					node
+					source_description
+		
+					skipped
+					events
+				]
+			else 
+				resources = %W[
+					resource
+					failed
+					skipped
+					events
+				]
+			end # if $verbose
 
-			].each { |x|
+			resources.each { |x|
 				@@string << %Q[\n\t\t#{x}: #{v[1].send( x.to_sym) }] if v[1].send( x.to_sym)
 			}
 		end # if v[1].change_count > 0
+		#@@string << extract_events(v[1].events)
 	} # aResource.each
 	return @@string
 end # def extract_resource_statuses( resObj )
@@ -239,6 +263,7 @@ end
 
 # Set verbose if interactive
 options[:verbose] = true if (options[:hostname] == nil or (options[:logs] == nil and options[:changes] == nil))
+$verbose = options[:verbose] # <-- I want this available globally
 
 
 begin # main rescue block
