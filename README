@@ -4,13 +4,15 @@ reportreader.rb
  - I have mine set to report hourly on changes that occur in the infrastructure. 
  - Eventually, I may come to rely on something like Dashboard or Foreman, but for now, this meets my requirements. 
 
-Usage: puppet_tools/reportreader.rb [options]
-    -t, --time PARAM                 Time scope by hours from now: default is 12
+Usage: ./reportreader.rb [options]
+    -f, --reportdir PARAM            Identify reports directory (default: /var/lib/puppet/reports)
+    -t, --time PARAM                 Time scope by hours from now
     -s, --hostname PARAM             Identify hostname to check
+    -T, --tags PARAM                 Identify tags to filter by. Verbose output includes matched tags. 
+                                       For example, '[a-z]{6} matches tags > 5 alpha characters.
+    -X, --reverse-tags PARAM         Identify tags to filter by. Matches are excluded.
     -c, --changes                    Print changed resources
     -l, --logs                       Print logs from changed resources
     -v, --verbose                    Increase verbosity
-    -f, --reportdir PARAM            Identify reports directory (default: /var/lib/puppet/reports)
+        --breakout                   Breakout into interactive mode after main completes
     -h, --help                       Display this screen
-jim@netops2s:~/opt$ 
-
