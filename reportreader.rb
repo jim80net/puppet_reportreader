@@ -24,14 +24,29 @@ optparse = OptionParser.new { |opts|
 
 	# Define the options, and what they do
 
+	options[:reportDir] = nil
+	opts.on( '-f', '--reportdir PARAM', 'Identify reports directory (default: /var/lib/puppet/reports)') { |reportDirParam|
+		options[:reportDir] = reportDirParam
+	} # end opts.on
+
 	options[:hours] = nil
-	opts.on( '-t', '--time PARAM', 'Time scope by hours from now: default is 12') { |timeParam|
+	opts.on( '-t', '--time PARAM', 'Time scope by hours from now') { |timeParam|
 		options[:hours] = timeParam.to_f
 	} # end opts.on
 
 	options[:hostname] = nil
 	opts.on( '-s', '--hostname PARAM', 'Identify hostname to check') { |hNameParam|
 		options[:hostname] = hNameParam
+	} # end opts.on
+
+	options[:tagFilter] = nil
+	opts.on( '-T', '--tags PARAM', "Identify tags to filter by. Verbose output includes matched tags. \n\t\t\t\t\tFor example, \'[a-z]{6} matches tags > 5 alpha characters.") { |tagParam|
+		options[:tagFilter] = tagParam
+	} # end opts.on
+
+	options[:tagReverseFilter] = nil
+	opts.on( '-X', '--reverse-tags PARAM', 'Identify tags to filter by. Matches are excluded.') { |tagParam|
+		options[:tagReverseFilter] = tagParam
 	} # end opts.on
  
 	options[:changes] = nil
@@ -49,9 +64,9 @@ optparse = OptionParser.new { |opts|
 		options[:verbose] = true
 	} # end opts.on
 
-	options[:reportDir] = nil
-	opts.on( '-f', '--reportdir PARAM', 'Identify reports directory (default: /var/lib/puppet/reports)') { |reportDirParam|
-		options[:reportDir] = reportDirParam
+	options[:breakout] = nil
+	opts.on('--breakout', 'Breakout into interactive mode after main completes') {
+		options[:breakout] = true
 	} # end opts.on
 
 	# This displays the help screen, all programs are
@@ -118,16 +133,17 @@ end # def filter_by_time( fileList, hours=12 )
 def read_report( fileList )
 	File.open(fileList) { |g|
 		if b = YAML.load(g) then
-			@@hsh = {
-				:configuration_version => b.configuration_version,
-				:host => b.host,
-				:kind => b.kind,
-				:logs => b.logs,
-				:metrics => b.metrics,
-				:resource_statuses => b.resource_statuses,
-				:status => b.status,
-				:time => b.time,
-			} # hsh = {
+				strings = %W[host time logs metrics resource_statuses configuration_version
+					report_format puppet_version kind status pending_count complaint_count
+					failed_count]
+				@@hsh = {}
+				strings.each { |string|
+					begin # strings.each rescue block
+					@@hsh[string.to_sym] =  b.send(string.to_sym) 
+
+					rescue NoMethodError # basically, do_nothing.
+					end # strings.each rescue block
+				} # strings.each { |string|
 		end # if b = YAML.load(g) then
 	} # File.open(f) { |g|
 
@@ -142,26 +158,14 @@ end # def read_report( fileList )
 #################
 #    OUTPUTS    #
 
-def extract_resource_statuses( resObj )
+def extract_resource_statuses( resObj, tagFilter=nil, tagReverseFilter=nil )
 	# http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Resource/Status
+	# http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3
 	# aResource[n] {|v| [0] = name ; [1] = Puppet::Resource::Status }
-	def extract_events(events)
-		@@event = ""
-		events.each { |y|
-			@@event << %Q[\n\t\t\t#{y.name}]
-			@@event << %Q[\n\t\t\t#{y.property}]
-			@@event << %Q[\n\t\t\t#{y.message}]
-			@@event << %Q[\n\t\t\tPrevious value: #{y.previous_value}]
-			@@event << %Q[\n\t\t\tDesired value: #{y.previous_value}]
-			@@event << %Q[\n\t\t\t#{y.status}]
-		} # v[1].events.each { |y|
-		return @@event
-	end # def extract_events(events)
 
 	@@string = ""
 	resObj.each { |v| 
 		if (v[1].change_count > 0 and v[1].resource != "Notify[environment_notice]") or (v[1].failed)
-			@@string << %Q[\n\t#{v[0]} ]
 
 			# Not included attributes: 
 			# title
@@ -197,17 +201,46 @@ def extract_resource_statuses( resObj )
 				]
 			end # if $verbose
 
-			resources.each { |x|
-				@@string << %Q[\n\t\t#{x}: #{v[1].send( x.to_sym) }] if v[1].send( x.to_sym)
-			}
+			@@tagString = ""
+			if tagFilter 
+				@@tagMatch = false
+				v[1].tags.each { |tag| 
+					if Regexp.new(tagFilter).match(tag)
+						@@tagMatch = true
+						@@tagString << "\n\t\t\t#{tag}"
+					end # if Regexp.new(tagFilter).match(tag)
+				} # v[1].tags.each { |tag| 
+			elsif tagReverseFilter
+				@@tagMatch = true
+				v[1].tags.each { |tag| 
+					if Regexp.new(tagReverseFilter).match(tag)
+						@@tagMatch = false
+					end # unless Regexp.new(tagReverseFilter).match(tag)
+				} # v[1].tags
+			else
+				@@tagMatch  = true
+			end # if tagFilter
+				
+			@@resourceString = ""
+			if @@tagMatch
+				resources.each { |x|
+					@@resourceString << %Q[\n\t\t#{x}: #{v[1].send( x.to_sym) }] if v[1].send( x.to_sym) 
+				} # resources.each { |x|
+			end # if @@tagMatch
+
+			if @@resourceString != ""
+				@@string << %Q[\n\t#{v[0]} ] 
+				@@string << @@resourceString
+				@@string << "\n\t\tMatching tags: #{@@tagString.to_s}" if $verbose
+			end # if @tempstring != ""
 		end # if v[1].change_count > 0
-		#@@string << extract_events(v[1].events)
 	} # aResource.each
 	return @@string
 end # def extract_resource_statuses( resObj )
 
 
 def extract_logs(logs)
+	# http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3
 	@@string = ""
 	logs.each { |v|
 		case v.level
@@ -221,11 +254,11 @@ def extract_logs(logs)
 end # def extract_logs(logs)
 
 
-def print_host_changes( anArr )
+def print_host_changes( anArr, tagFilter=nil, tagReverseFilter=nil)
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
 	anArr.each {|w| 
 		v = read_report(w) 
-			string = extract_resource_statuses(v[:resource_statuses]) if v[:resource_statuses]
+			string = extract_resource_statuses(v[:resource_statuses], tagFilter, tagReverseFilter) if v[:resource_statuses]
 			puts(
 				%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
 			) if (v[:status] == "changed" and  string != "") or (v[:status] == "failed")
@@ -233,7 +266,7 @@ def print_host_changes( anArr )
 end # def print_host_changes( aHostname, anArr ) 
 
 
-def print_host_logs( anArr )
+def print_host_logs( anArr, tagFilter=nil, tagReverseFilter=nil )
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
 	anArr.each {|w| 
 		v = read_report(w)
@@ -327,6 +360,8 @@ begin # main rescue block
 
 	
 	begin # options:changes rescue block
+		if options[:tagFilter] then tagFilter = options[:tagFilter] else tagFilter = nil end
+		if options[:tagReverseFilter] then tagReverseFilter = options[:tagReverseFilter] else tagReverseFilter = nil end
 		if !(options[:changes] or options[:logs])
 			puts("What information do you want?")
 			print("\n\tc: Print host changes.")
@@ -336,10 +371,10 @@ begin # main rescue block
 			ans = gets().chomp()
 			case ans
 				when /c/
-					print_host_changes(a)
+					print_host_changes(a, tagFilter, tagReverseFilter)
 					raise "Returning to menu"
 				when /l/
-					print_host_logs(a)
+					print_host_logs(a, tagFilter, tagReverseFilter)
 					raise "Returning to menu"
 				when /q/
 					do_nothing
@@ -347,8 +382,8 @@ begin # main rescue block
 					raise "Invalid selection"
 			end # case ans
 		else
-			print_host_changes(a) if options[:changes]
-			print_host_logs(a) if options[:logs]
+			print_host_changes(a, tagFilter, tagReverseFilter) if options[:changes]
+			print_host_logs(a, tagFilter, tagReverseFilter) if options[:logs]
 		end # if !(options[:changes] or options[:logs])
 
 		rescue RuntimeError => e
@@ -357,36 +392,34 @@ begin # main rescue block
 	end # options:changes rescue block
 
 
-#	# Break out into interactive session
-#	# http://bogojoker.com/readline/
-#	require 'readline'
-#	puts("Summary information is hashed into: a, an array")
-#	puts("\n\nNo more code after this. Going interactive.")
-#	puts("Newline to eval.'q' to exit.") 
-#	program = ""
-#	input = ""
-#	line = ""
-#	until line.strip() == "q"
-#		line = Readline.readline('> ', true)
-#		begin # rescue block
-#		case( line.strip() )
-#			when '' 
-#				puts( "Evaluating..." )
-#				eval( input ) 
-#				input = ""
-#			else 
-#				input += line
-#		end #case
-#		rescue StandardError, SyntaxError => e
-#			puts("Error: " + e.to_s)
-#			input = ""
-#			retry
-#		end # rescue block
-#	end # until
-#
-#	rescue RuntimeError => e
-#		puts("Error: " + e.to_s)
-#		retry
+	#	# Break out into interactive session
+	#	# http://bogojoker.com/readline/
+	if options[:breakout] 
+		require 'readline'
+		puts("Summary information is hashed into: a, an array")
+		puts("\n\nNo more code after this. Going interactive.")
+		puts("Newline to eval.'q' to exit.") 
+		program = ""
+		input = ""
+		line = ""
+		until line.strip() == "q"
+			line = Readline.readline('> ', true)
+			begin # rescue block
+			case( line.strip() )
+				when '' 
+					puts( "Evaluating..." )
+					eval( input ) 
+					input = ""
+				else 
+					input += line
+			end #case
+			rescue StandardError, SyntaxError => e
+				puts("Error: " + e.to_s)
+				input = ""
+				retry
+			end # rescue block
+		end # until
+	end # if options[:breakout]
 
 
 	# Rescue stuff
