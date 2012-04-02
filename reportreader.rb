@@ -34,6 +34,11 @@ optparse = OptionParser.new { |opts|
 		options[:hours] = timeParam.to_f
 	} # end opts.on
 
+	options[:deleteolder] = nil
+	opts.on( '-D', '--deleteolder', 'Delete files older than "-t" time') { 
+		options[:deleteolder] = true
+	} # end opts.on
+
 	options[:hostname] = nil
 	opts.on( '-s', '--hostname PARAM', 'Identify hostname to check') { |hNameParam|
 		options[:hostname] = hNameParam
@@ -120,13 +125,16 @@ end # def process_files( aDir )
 
 def filter_by_time( fileList, hours=12 )
 	arr = []
+	olderarr = []
 	fileList.each { |f|
 		if (Time.now - (hours*60*60)).gmtime.strftime("%Y%m%d%H%M") <  f[/[0-9]{12}.yaml/]
 			arr.push(f)
+		else 
+			olderarr.push(f)
 		end # if (Time.now - (hours*60*60)).gmtime.strftime("%Y%m%d%H%M") <  f[/[0-9]{12}.yaml/]
 	} #fileList.each { |f|
 	arr2 = arr.sort { |x,y| y <=> x } # reverse sort puts present on top of past, though this means hostnames are backwards as well. 
-	return arr2
+	return arr2,olderarr
 end # def filter_by_time( fileList, hours=12 )
 
 
@@ -350,13 +358,26 @@ begin # main rescue block
 			ans = options[:hours]
 		end # if options[:hours] == nil
 	
-		a = filter_by_time(checkedList,ans.to_f) 
-		puts("Found #{a.length} reports.") if options[:verbose]
+		timeFiltered = filter_by_time(checkedList,ans.to_f) 
+		a = timeFiltered[0]
+		puts("Found #{a.length} reports that are within time scope.") if options[:verbose]
 
 		rescue
 			puts "Error with time."
 			retry
 	end # filter by hours rescue block
+
+
+	begin # delete older rescue block
+		if options[:deleteolder]
+			olderfiles = timeFiltered[1]
+			print "Deleting #{olderfiles.length.to_s} files..."
+			olderfiles.each { |v| File.delete(v) }
+			print "done."
+			exit
+		end #if options[:deleteolder]
+		
+	end # delete older rescue block
 
 	
 	begin # options:changes rescue block
@@ -372,6 +393,7 @@ begin # main rescue block
 			case ans
 				when /c/
 					print_host_changes(a, tagFilter, tagReverseFilter)
+					print(tagFilter, tagReverseFilter)
 					raise "Returning to menu"
 				when /l/
 					print_host_logs(a, tagFilter, tagReverseFilter)
@@ -382,6 +404,7 @@ begin # main rescue block
 					raise "Invalid selection"
 			end # case ans
 		else
+			print("#{"Searching for tags " if tagFilter or tagReverseFilter}#{"matching: #{tagFilter}" if tagFilter}#{"not matching: #{tagReverseFilter}" if tagReverseFilter}\n") if $verbose
 			print_host_changes(a, tagFilter, tagReverseFilter) if options[:changes]
 			print_host_logs(a, tagFilter, tagReverseFilter) if options[:logs]
 		end # if !(options[:changes] or options[:logs])
