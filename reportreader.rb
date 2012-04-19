@@ -10,89 +10,6 @@
 def do_nothing() 
 end # close do_nothing
 
-################
-#    INPUTS    #
-require 'optparse'
-
-# This hash will hold all of the options
-# parsed from the command-line by OptionParser.
-options = {}
-optparse = OptionParser.new { |opts|
-	# Set a banner, displayed at the top
-	# of the help screen.
-	opts.banner = "Usage: #{$0} [options]"
-
-	# Define the options, and what they do
-
-	options[:reportDir] = nil
-	opts.on( '-f', '--reportdir PARAM', 'Identify reports directory (default: /var/lib/puppet/reports)') { |reportDirParam|
-		options[:reportDir] = reportDirParam
-	} # end opts.on
-
-	options[:hours] = nil
-	opts.on( '-t', '--time PARAM', 'Time scope by hours from now') { |timeParam|
-		options[:hours] = timeParam.to_f
-	} # end opts.on
-
-	options[:deleteolder] = nil
-	opts.on( '-D', '--deleteolder', 'Delete files older than "-t" time') { 
-		options[:deleteolder] = true
-	} # end opts.on
-
-	options[:hostname] = nil
-	opts.on( '-s', '--hostname PARAM', 'Identify hostname to check') { |hNameParam|
-		options[:hostname] = hNameParam
-	} # end opts.on
-
-	options[:tagFilter] = nil
-	opts.on( '-T', '--tags PARAM', "Identify tags to filter by. Verbose output includes matched tags. \n\t\t\t\t\tFor example, \'[a-z]{6} matches tags > 5 alpha characters.") { |tagParam|
-		options[:tagFilter] = tagParam
-	} # end opts.on
-
-	options[:tagReverseFilter] = nil
-	opts.on( '-X', '--reverse-tags PARAM', 'Identify tags to filter by. Matches are excluded.') { |tagParam|
-		options[:tagReverseFilter] = tagParam
-	} # end opts.on
- 
-	options[:changes] = nil
-	opts.on( '-c', '--changes', 'Print changed resources') { 
-		options[:changes] = true
-	} # end opts.on
-
-	options[:logs] = nil
-	opts.on( '-l', '--logs', 'Print logs from changed resources') { 
-		options[:logs] = true
-	} # end opts.on
-
-	options[:verbose] = nil
-	opts.on( '-v', '--verbose', 'Increase verbosity') { 
-		options[:verbose] = true
-	} # end opts.on
-
-	options[:breakout] = nil
-	opts.on('--breakout', 'Breakout into interactive mode after main completes') {
-		options[:breakout] = true
-	} # end opts.on
-
-	# This displays the help screen, all programs are
-	# assumed to have this option.
-	opts.on( '-h', '--help', 'Display this screen' ) do
-		puts opts
-		exit
-	end # end opts.on
-
-} # optparse = OptionParser.new { |opts|
-
-# Parse the command-line. Remember there are two forms
-# of the parse method. The 'parse' method simply parses
-# ARGV, while the 'parse!' method parses ARGV and removes
-# any options found there.
-optparse.parse!
-
-#    INPUTS    #
-################
-
-
 #########################
 #    PRE PROCESSING     #
 
@@ -159,32 +76,35 @@ def read_report( fileList )
 
 end # def read_report( fileList )
 
-#    PRE PROCESSING     #
-#########################
-	
-
-#################
-#    OUTPUTS    #
 
 def extract_resource_statuses( resObj, tagFilter=nil, tagReverseFilter=nil )
 	# http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Resource/Status
 	# http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3
-	# aResource[n] {|v| [0] = name ; [1] = Puppet::Resource::Status }
 
 	@@string = ""
 	resObj.each { |v| 
-		if (v[1].change_count > 0 and v[1].resource != "Notify[environment_notice]") or (v[1].failed)
+		#if (v[1].change_count > 0  or v[1].failed) 
+		@@skip = false
+		if $customMethods != []
+			@@skip = true
+			$customMethods.each { |method|
+				if method[1]
+					@@skip = false if eval("v[1].#{method[0]} #{method[1]}")
+				else
+					@@skip = false if v[1].send(method[0]) 
+				end # if method[1]
+			} # $customMethods.each { |method|
+		end # if $customMethods != []
 
 			# Not included attributes: 
 			# title
 			# resource_type
-			# change_count
-			# out_of_sync_count
-			# changed
+			# 
 			if $verbose
 				resources = %W[
 					resource
 					failed
+					changed
 		
 					time
 					evaluation_time
@@ -196,6 +116,11 @@ def extract_resource_statuses( resObj, tagFilter=nil, tagReverseFilter=nil )
 					default_log_level
 					node
 					source_description
+					change_count
+					out_of_sync_count
+					pending_count
+					compliant_count
+					failed_count
 		
 					skipped
 					events
@@ -226,24 +151,28 @@ def extract_resource_statuses( resObj, tagFilter=nil, tagReverseFilter=nil )
 					end # unless Regexp.new(tagReverseFilter).match(tag)
 				} # v[1].tags
 			else
-				@@tagMatch  = true
+				@@tagMatch  = true # if neither are defined, print it
 			end # if tagFilter
 				
 			@@resourceString = ""
 			if @@tagMatch
 				resources.each { |x|
+					begin
 					@@resourceString << %Q[\n\t\t#{x}: #{v[1].send( x.to_sym) }] if v[1].send( x.to_sym) 
+					rescue NoMethodError # basically, do nothing
+					end
 				} # resources.each { |x|
 			end # if @@tagMatch
 
-			if @@resourceString != ""
+			if @@resourceString != "" and @@skip == false
 				@@string << %Q[\n\t#{v[0]} ] 
 				@@string << @@resourceString
 				@@string << "\n\t\tMatching tags: #{@@tagString.to_s}" if $verbose
 			end # if @tempstring != ""
-		end # if v[1].change_count > 0
+		# end # if v[1].send($customMethod.to_sym,$customMethodArgs) if $customMethod and $customMethodArgs
+		#end # if v[1].change_count > 0
 	} # aResource.each
-	return @@string
+	return @@string 
 end # def extract_resource_statuses( resObj )
 
 
@@ -261,15 +190,21 @@ def extract_logs(logs)
 	return @@string
 end # def extract_logs(logs)
 
+#    PRE PROCESSING     #
+#########################
+	
+
+#################
+#    OUTPUTS    #
 
 def print_host_changes( anArr, tagFilter=nil, tagReverseFilter=nil)
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
 	anArr.each {|w| 
 		v = read_report(w) 
-			string = extract_resource_statuses(v[:resource_statuses], tagFilter, tagReverseFilter) if v[:resource_statuses]
-			puts(
-				%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
-			) if (v[:status] == "changed" and  string != "") or (v[:status] == "failed")
+		string = extract_resource_statuses(v[:resource_statuses], tagFilter, tagReverseFilter) if v[:resource_statuses]
+		puts(
+			%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
+		) if ( string and string.length() > 0 ) #or (v[:status] == "failed")
 	} # anArr.each {|w| 
 end # def print_host_changes( aHostname, anArr ) 
 
@@ -278,10 +213,10 @@ def print_host_logs( anArr, tagFilter=nil, tagReverseFilter=nil )
 # http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report
 	anArr.each {|w| 
 		v = read_report(w)
-			string = extract_logs(v[:logs]) if v[:logs]
-			puts(
-				%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
-			) if (v[:status] == "changed" and  string != "") or (v[:status] == "failed")
+		string = extract_logs(v[:logs]) if v[:logs]
+		puts(
+			%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]
+		) if ( string and string.length() > 0 ) #or (v[:status] == "failed")
 	}
 end # def print_host_logs( anArr ) 
 
@@ -291,6 +226,105 @@ end # def print_host_logs( anArr )
 
 ##########################
 #    MAIN (in effect)    #
+
+
+	#################
+	#    OPTIONS    #
+	require 'optparse'
+	
+	# This hash will hold all of the options
+	# parsed from the command-line by OptionParser.
+	options = {}
+	optparse = OptionParser.new { |opts|
+		# Set a banner, displayed at the top
+		# of the help screen.
+		opts.banner = "Usage: #{$0} [options]"
+	
+		# Define the options, and what they do
+	
+		options[:reportDir] = nil
+		opts.on( '-f', '--reportdir PARAM', 'Identify reports directory (default: /var/lib/puppet/reports)') { |reportDirParam|
+			options[:reportDir] = reportDirParam
+		} # end opts.on
+	
+		options[:hours] = nil
+		opts.on( '-t', '--time PARAM', 'Time scope by hours from now') { |timeParam|
+			options[:hours] = timeParam.to_f
+		} # end opts.on
+	
+		options[:deleteolder] = nil
+		opts.on( '-D', '--deleteolder', 'Delete files older than "-t" time') { 
+			options[:deleteolder] = true
+		} # end opts.on
+	
+		options[:hostname] = nil
+		opts.on( '-s', '--hostname PARAM', 'Identify hostname to check') { |hNameParam|
+			options[:hostname] = hNameParam
+		} # end opts.on
+	
+		options[:tagFilter] = nil
+		opts.on( '-T', '--tags PARAM', "Identify tags to filter by. Verbose output includes matched tags. Wrap in single parens. Pretend the parens are the equivalent of / /. For example, \'[a-z]{6}\' matches tags > 5 alpha characters.") { |tagParam|
+			options[:tagFilter] = tagParam
+		} # end opts.on
+	
+		options[:tagReverseFilter] = nil
+		opts.on( '-X', '--reverse-tags PARAM', 'Identify tags to filter by. Matches are excluded.') { |tagParam|
+			options[:tagReverseFilter] = tagParam
+		} # end opts.on
+		
+		$customMethods = []
+		opts.on( '-R', '--custom-method PARAM', 'send custom method to filter Puppet::Resource::Status. ex: -R "change_count > 0,failed".') { |cMParam|
+			@arr = cMParam.split(',')
+			@arr.each { |method|
+				/\s/.match(method)
+				@meth = []
+				if $`
+					@meth[0] = $`
+				else 
+					@meth[0] = method
+				end
+				@meth[1] = $'
+				$customMethods.push(@meth)
+			} # @arr.each { |method|
+		} # end opts.on
+	 
+		options[:changes] = nil
+		opts.on( '-c', '--changes', 'Print changed resources') { 
+			options[:changes] = true
+		} # end opts.on
+	
+		options[:logs] = nil
+		opts.on( '-l', '--logs', 'Print logs from changed resources') { 
+			options[:logs] = true
+		} # end opts.on
+	
+		options[:verbose] = nil
+		opts.on( '-v', '--verbose', 'Increase verbosity') { 
+			options[:verbose] = true
+		} # end opts.on
+	
+		options[:breakout] = nil
+		opts.on('--breakout', 'Breakout into interactive mode after main completes') {
+			options[:breakout] = true
+		} # end opts.on
+	
+		# This displays the help screen, all programs are
+		# assumed to have this option.
+		opts.on( '-h', '--help', 'Display this screen' ) do
+			puts opts
+			exit
+		end # end opts.on
+	
+	} # optparse = OptionParser.new { |opts|
+	
+	# Parse the command-line. Remember there are two forms
+	# of the parse method. The 'parse' method simply parses
+	# ARGV, while the 'parse!' method parses ARGV and removes
+	# any options found there.
+	optparse.parse!
+	
+	#    OPTIONS    #
+	#################
 
 # Set reportDir if not defined 
 if options[:reportDir] 

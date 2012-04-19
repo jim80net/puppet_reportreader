@@ -7,12 +7,24 @@ reportreader.rb
 Usage: ./reportreader.rb [options]
     -f, --reportdir PARAM            Identify reports directory (default: /var/lib/puppet/reports)
     -t, --time PARAM                 Time scope by hours from now
+    -D, --deleteolder                Delete files older than "-t" time
     -s, --hostname PARAM             Identify hostname to check
-    -T, --tags PARAM                 Identify tags to filter by. Verbose output includes matched tags. 
-                                       For example, '[a-z]{6} matches tags > 5 alpha characters.
+    -T, --tags PARAM                 Identify tags to filter by. Verbose output includes matched tags. Wrap in single parens. Pretend the parens are the equivalent of / /. For example, '[a-z]{6}' matches tags > 5 alpha characters.
     -X, --reverse-tags PARAM         Identify tags to filter by. Matches are excluded.
+    -R, --custom-method PARAM        send custom method to filter Puppet::Resource::Status. ex: -R "change_count > 0,failed".
     -c, --changes                    Print changed resources
     -l, --logs                       Print logs from changed resources
     -v, --verbose                    Increase verbosity
         --breakout                   Breakout into interactive mode after main completes
     -h, --help                       Display this screen
+
+
+examples: 
+
+reportreader.rb -t 4 -c -s all -X '(environment_notice|augeas)' -R 'change_count > 0,failed'
+	- report changes in the last 4 hours to all nodes excluding resources with tags environment_notice or augueas ( which is chatty in noop mode). 
+	- -R 'change_count > 0,failed' indicates all resources that have changed or have failed
+	- Refer to http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3 for Puppet::Resource::Status attributes.
+
+reportreader.rb -t 1 -c -s all -T 'trunk' -R 'change_count > 0,failed' 
+	- report changed or failed resources that have the tag "trunk" within the last hour on all nodes. 
