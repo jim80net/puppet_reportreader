@@ -16,7 +16,7 @@ end # close do_nothing
 # Recurse through reportDir in search of files. 
 # Return files = file list
 def process_files( aDir )
-	require 'find'
+	#require 'find'
 
 	unless FileTest.directory?(aDir)
 		puts "Error. Invalid input for report directory: #{aDir}."
@@ -25,17 +25,31 @@ def process_files( aDir )
 
 	@@files = []
 	@@directories = []
-	Find.find( aDir ) { |f|
-			@@files.push(f) if f.match(/\.yaml\Z/)
-			if FileTest.directory?(f)
-				 arr = f.split('/')
-				 arr2 = arr[arr.length - 1]
-				 @@directories.push(arr2) 
-			end
-	} # Find.find( aDir ) { |f|
 
-	directories = @@directories[1..@@directories.length].sort
-	files = @@files.sort
+	def process_files_recurse(aDir) 
+		@@tempFiles = []
+		Dir.foreach( aDir ) { |f|
+			myPath = "#{aDir}\/#{f}"
+			if FileTest.directory?(myPath) and f != '.' and f != '..'
+				 #arr = f.split('/')
+				 #arr2 = arr[arr.length - 1]
+				 #@@directories.push(arr2) 
+				 process_files_recurse(myPath)
+			else
+				@@tempFiles.push(myPath) if f.match(/\.yaml\Z/)
+			end
+		} # Find.find( aDir ) { |f|
+		sortedTempFiles = @@tempFiles.sort 
+		
+		@@files.push(sortedTempFiles)
+		@@directories.push([aDir[/[^\/]+$/],sortedTempFiles[sortedTempFiles.length - 1]])
+	end # def process_files_recurse (aDir) 
+
+	process_files_recurse(aDir)
+
+	files = @@files.sort.flatten
+	directories = @@directories[0..(@@directories.length - 2)].sort_by { |e| e.nil? ? 'z' : e[0] } 
+
 	return files,directories
 end # def process_files( aDir )
 
@@ -273,7 +287,7 @@ end # def print_host_logs( anArr )
 		} # end opts.on
 		
 		$customMethods = []
-		opts.on( '-R', '--custom-method PARAM', 'send custom method to filter Puppet::Resource::Status. ex: -R "change_count > 0,failed".') { |cMParam|
+		def parse_custom_methods(cMParam) 
 			@arr = cMParam.split(',')
 			@arr.each { |method|
 				/\s/.match(method)
@@ -286,11 +300,17 @@ end # def print_host_logs( anArr )
 				@meth[1] = $'
 				$customMethods.push(@meth)
 			} # @arr.each { |method|
+		end # def parse_custom_methods 
+		options[:customMethods] = nil
+		opts.on( '-R', '--custom-method PARAM', 'send custom method to filter Puppet::Resource::Status. ex: -R "change_count > 0,failed" is equivalent to "-c".') { |cMParam|
+			options[:customMethods] = true
+			parse_custom_methods(cMParam)
 		} # end opts.on
-	 
+
 		options[:changes] = nil
 		opts.on( '-c', '--changes', 'Print changed resources') { 
 			options[:changes] = true
+			parse_custom_methods('change_count > 0,failed')
 		} # end opts.on
 	
 		options[:logs] = nil
@@ -356,11 +376,12 @@ begin # main rescue block
 	begin # options:hostname rescue block
 		if options[:hostname] == nil
 			puts(%Q[Found the following host entries:\n])
+			puts(%Q[ Index: Hostname:                        Last Report: \n])
 			dirList.sort.each {|v|
-				puts("\t #{dirList.index(v)}: #{v}")
+				puts("    #{dirList.index(v).to_s.rjust(2)}: #{v[0].ljust(32)} #{v[1][/\d{12}\.yaml$/][0..11] if v[1]}")
 			} 
 			print("done.\n\n") 
-			print("Which host(s) do you want?['all' for all]:")
+			print("Which host do you want?['all' for all]:")
 			ans = gets().chomp()
 			# TODO: entering a string that is not dirList.include? will return array[0], as to_f for a string = 0.0
 		else
@@ -369,10 +390,10 @@ begin # main rescue block
 
 		if ans == "all"
 			checkedList = fileList
-		elsif dirList.include?(ans)
+		elsif dirList.flatten.include?(ans)
 			checkedList = process_files(reportDir + ans)[0]
-		elsif dirList.include?(dirList.values_at(ans.to_f).to_s) and !(ans == "") 
-			checkedList = process_files(reportDir + dirList.values_at(ans.to_f).to_s)[0]
+		elsif dirList.flatten.include?(dirList.values_at(ans.to_f).flatten.fetch(0).to_s) and !(ans == "") 
+			checkedList = process_files(reportDir + dirList.values_at(ans.to_f).flatten.fetch(0).to_s)[0]
 		else
 			raise "Invalid hostname selection"
 		end
@@ -385,7 +406,7 @@ begin # main rescue block
 
 	begin # filter by hours rescue block
 		if options[:hours] == nil
-			print("How many hours ago shall we check?:")
+			print("\nHow many hours ago shall we check?:")
 			ans = gets().chomp()
 			if !(ans[/[0-9]+/]) then raise end
 		else
@@ -417,21 +438,30 @@ begin # main rescue block
 	begin # options:changes rescue block
 		if options[:tagFilter] then tagFilter = options[:tagFilter] else tagFilter = nil end
 		if options[:tagReverseFilter] then tagReverseFilter = options[:tagReverseFilter] else tagReverseFilter = nil end
-		if !(options[:changes] or options[:logs])
+		if !(options[:changes] or options[:logs] or options[:customMethods])
 			puts("What information do you want?")
 			print("\n\tc: Print host changes.")
 			print("\n\tl: Print host logs.")
+			print("\n\tR: Filter using custom query.")
 			print("\n\tq: exit from this menu.\n")
 			print("Enter your selection:")
 			ans = gets().chomp()
 			case ans
 				when /c/
+					parse_custom_methods('change_count > 0,failed')
+					puts("Parsing reports using #{p $customMethods}")
 					print_host_changes(a, tagFilter, tagReverseFilter)
 					print(tagFilter, tagReverseFilter)
 					raise "Returning to menu"
 				when /l/
 					print_host_logs(a, tagFilter, tagReverseFilter)
 					raise "Returning to menu"
+				when /R/
+					print("Enter custom query:")
+					cMParam = gets().chomp()
+					parse_custom_methods(cMParam)
+					puts("Parsing reports using #{p $customMethods}")
+					print_host_changes(a, tagFilter, tagReverseFilter)
 				when /q/
 					do_nothing
 			    else
