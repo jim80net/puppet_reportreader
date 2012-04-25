@@ -446,6 +446,7 @@ within timescope], [files outside of timescope] ]</p>
                         <span class="ruby-ivar">@meth</span>[<span class="ruby-value">0</span>] = <span class="ruby-identifier">method</span>
                 <span class="ruby-keyword">end</span> <span class="ruby-comment"># if /\s/.match(method)</span>
 
+                <span class="ruby-identifier">$customMethods</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-ivar">@meth</span>)
                 <span class="ruby-identifier">$customMethods</span>.<span class="ruby-identifier">push</span>(<span class="ruby-ivar">@meth</span>)
 
         } <span class="ruby-comment"># @arr.each { |method|</span>
