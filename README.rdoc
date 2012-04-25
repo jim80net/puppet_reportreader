@@ -1,0 +1,37 @@
+=[reportreader.rb]
+This tool was created because a google search for CLI report reader
+returned: nada. reportreader.rb is useful for creating crontabs that i
+report on changes made in a certain time period. I have mine set to 
+report hourly on changes. Eventually, I may come to rely on something 
+like Dashboard or Foreman, but for now, this meets my requirements. 
+-----------------------------------------------------------------------
+
+==[Usage]:
+
+    Usage: ./reportreader.rb [options]
+      -f, --reportdir PARAM            Identify reports directory (default: /var/lib/puppet/reports)
+      -t, --time PARAM                 Time scope by hours from now
+      -D, --deleteolder                Delete files older than "-t" time
+      -s, --hostname PARAM             Identify hostname to check
+      -T, --tags PARAM                 Identify tags to filter by. Verbose output includes matched tags. Wrap in single parens. Pretend the parens are the equivalent of / /. For example, '[a-z]{6}' matches tags > 5 alpha characters.
+      -X, --reverse-tags PARAM         Identify tags to filter by. Matches are excluded.
+      -R, --custom-method PARAM        send custom method to filter Puppet::Resource::Status. ex: -R "change_count > 0,failed". Refer to http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3 for Puppet::Resource::Status attributes.
+      -c, --changes                    Print changed resources. equivalent to -R 'change_count > 0,failed'
+      -l, --logs                       Print logs from changed resources
+      -v, --verbose                    Increase verbosity
+          --breakout                   Breakout into interactive mode after main completes
+      -h, --help                       Display this screen
+
+
+==[examples]: 
+
+ reportreader.rb -t 4 -c -s all -X '(trunk|augeas)'
+	report changes in the last 4 hours to all nodes excluding resources
+	with tags trunk or augueas (which is chatty in noop mode). 
+
+ reportreader.rb -t 1 -c -s all -T 'trunk' 
+	report changed or failed resources that have the tag "trunk" within 
+	the last hour on all nodes. 
+
+ reportreader.rb -t 1 -s all -R 'resource == "Service[samba]"'
+	report all Puppet::Resource::Status where instance.resource == "Service[samba]"
