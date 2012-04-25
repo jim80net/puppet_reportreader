@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>class Object - reportreader.rb</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>reportreader.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">BasicObject
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-i-do_nothing">#do_nothing</a>
+    
+    <li><a href="#method-i-extract_logs">#extract_logs</a>
+    
+    <li><a href="#method-i-extract_resource_statuses">#extract_resource_statuses</a>
+    
+    <li><a href="#method-i-filter_by_time">#filter_by_time</a>
+    
+    <li><a href="#method-i-parse_custom_methods">#parse_custom_methods</a>
+    
+    <li><a href="#method-i-print_host_changes">#print_host_changes</a>
+    
+    <li><a href="#method-i-print_host_logs">#print_host_logs</a>
+    
+    <li><a href="#method-i-process_files">#process_files</a>
+    
+    <li><a href="#method-i-process_files_recurse">#process_files_recurse</a>
+    
+    <li><a href="#method-i-read_report">#read_report</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./README.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./Object.html">Object</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class Object</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-do_nothing" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">do_nothing</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Literally, do nothing.</p>
+          
+
+          
+          <div class="method-source-code" id="do_nothing-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 15</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">do_nothing</span>() 
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- do_nothing-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- do_nothing-method -->
+
+    
+      <div id="method-i-extract_logs" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">extract_logs</span><span
+            class="method-args">(logs)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Simpler extract method which, given Puppet::Transaction::Report.logs
+output, returns strings if within a certain log level</p>
+
+<p><a
+href="http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3">projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3</a></p>
+          
+
+          
+          <div class="method-source-code" id="extract_logs-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 248</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract_logs</span>(<span class="ruby-identifier">logs</span>)
+        <span class="ruby-identifier">@@string</span> = <span class="ruby-string">&quot;&quot;</span>
+
+        <span class="ruby-identifier">logs</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+                <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">level</span>
+                        <span class="ruby-keyword">when</span> (<span class="ruby-value">:info</span> <span class="ruby-keyword">or</span> <span class="ruby-value">:notice</span> <span class="ruby-keyword">or</span> <span class="ruby-value">:warning</span> <span class="ruby-keyword">or</span> <span class="ruby-value">:err</span> <span class="ruby-keyword">or</span> <span class="ruby-value">:alert</span> <span class="ruby-keyword">or</span> <span class="ruby-value">:emerg</span> <span class="ruby-keyword">or</span> <span class="ruby-value">:crit</span>)
+                                <span class="ruby-identifier">@@string</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;\n\t&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">time</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;: &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">message</span> 
+                        <span class="ruby-keyword">else</span> <span class="ruby-comment"># /:debug/ or /:info/ </span>
+                                <span class="ruby-identifier">do_nothing</span>
+                <span class="ruby-keyword">end</span> <span class="ruby-comment">#case v.level</span>
+
+        } <span class="ruby-comment"># logs.each { |v|</span>
+
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">@@string</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- extract_logs-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- extract_logs-method -->
+
+    
+      <div id="method-i-extract_resource_statuses" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">extract_resource_statuses</span><span
+            class="method-args">( resObj, tagFilter=nil, tagReverseFilter=nil )</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Puppet::Resource::Status is the output from a  <code>
+Puppet::Transaction::Report.resource_statuses[1]. </code>  For each
+resource,</p>
+<ul><li>
+<p>compare tags against tagFilter and tagReverseFilter</p>
+</li><li>
+<p>eval against $customMethods</p>
+</li></ul>
+
+<p>Return @@string of resource attributes if above queries are true.</p>
+
+<p><a
+href="http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Resource/Status">rubydoc.info/github/puppetlabs/puppet/master/Puppet/Resource/Status</a></p>
+
+<p><a
+href="http://projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3">projects.puppetlabs.com/projects/puppet/wiki/Report_Format_3</a></p>
+          
+
+          
+          <div class="method-source-code" id="extract_resource_statuses-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 130</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract_resource_statuses</span>( <span class="ruby-identifier">resObj</span>, <span class="ruby-identifier">tagFilter</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">tagReverseFilter</span>=<span class="ruby-keyword">nil</span> )
+
+        <span class="ruby-identifier">@@string</span> = <span class="ruby-string">&quot;&quot;</span>
+
+        <span class="ruby-identifier">resObj</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> 
+                <span class="ruby-identifier">@@skip</span> = <span class="ruby-keyword">false</span>
+
+                <span class="ruby-keyword">if</span> <span class="ruby-identifier">$customMethods</span> <span class="ruby-operator">!=</span> []
+                        <span class="ruby-identifier">@@skip</span> = <span class="ruby-keyword">true</span>
+
+                        <span class="ruby-identifier">$customMethods</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">method</span><span class="ruby-operator">|</span>
+                                <span class="ruby-keyword">if</span> <span class="ruby-identifier">method</span>[<span class="ruby-value">1</span>]
+                                        <span class="ruby-identifier">@@skip</span> = <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">eval</span>(<span class="ruby-node">&quot;v[1].#{method[0]} #{method[1]}&quot;</span>)
+                                <span class="ruby-keyword">else</span>
+                                        <span class="ruby-identifier">@@skip</span> = <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>[<span class="ruby-value">0</span>]) 
+                                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if method[1]</span>
+
+                        } <span class="ruby-comment"># $customMethods.each { |method|</span>
+
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if $customMethods != []</span>
+
+                <span class="ruby-comment">##</span>
+                <span class="ruby-comment"># Not included attributes: </span>
+                <span class="ruby-comment"># title</span>
+                <span class="ruby-comment"># resource_type</span>
+                 
+                <span class="ruby-keyword">if</span> <span class="ruby-identifier">$verbose</span>
+                        <span class="ruby-identifier">resources</span> = <span class="ruby-node">%W[
+                                resource
+                                failed
+                                changed
+        
+                                time
+                                evaluation_time
+                                file
+                                line
+        
+                                status
+                                current_values
+                                default_log_level
+                                node
+                                source_description
+                                change_count
+                                out_of_sync_count
+                                pending_count
+                                compliant_count
+                                failed_count
+        
+                                skipped
+                                events
+                        ]</span>
+                <span class="ruby-keyword">else</span> 
+                        <span class="ruby-identifier">resources</span> = <span class="ruby-node">%W[
+                                resource
+                                failed
+                                skipped
+                                events
+                        ]</span>
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if $verbose</span>
+
+                <span class="ruby-identifier">@@tagString</span> = <span class="ruby-string">&quot;&quot;</span>
+
+                <span class="ruby-keyword">if</span> <span class="ruby-identifier">tagFilter</span> 
+                        <span class="ruby-identifier">@@tagMatch</span> = <span class="ruby-keyword">false</span>
+
+                        <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">tags</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">tag</span><span class="ruby-operator">|</span> 
+                                <span class="ruby-keyword">if</span> <span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">tagFilter</span>).<span class="ruby-identifier">match</span>(<span class="ruby-identifier">tag</span>)
+                                        <span class="ruby-identifier">@@tagMatch</span> = <span class="ruby-keyword">true</span>
+                                        <span class="ruby-identifier">@@tagString</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;\n\t\t\t#{tag}&quot;</span>
+                                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if Regexp.new(tagFilter).match(tag)</span>
+
+                        } <span class="ruby-comment"># v[1].tags.each { |tag| </span>
+
+                <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">tagReverseFilter</span>
+                        <span class="ruby-identifier">@@tagMatch</span> = <span class="ruby-keyword">true</span>
+
+                        <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">tags</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">tag</span><span class="ruby-operator">|</span> 
+                                <span class="ruby-keyword">if</span> <span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">tagReverseFilter</span>).<span class="ruby-identifier">match</span>(<span class="ruby-identifier">tag</span>)
+                                        <span class="ruby-identifier">@@tagMatch</span> = <span class="ruby-keyword">false</span>
+                                <span class="ruby-keyword">end</span> <span class="ruby-comment"># unless Regexp.new(tagReverseFilter).match(tag)</span>
+
+                        } <span class="ruby-comment"># v[1].tags</span>
+
+                <span class="ruby-keyword">else</span>
+                        <span class="ruby-identifier">@@tagMatch</span>  = <span class="ruby-keyword">true</span> <span class="ruby-comment"># if neither are defined, print it</span>
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if tagFilter</span>
+                        
+                <span class="ruby-identifier">@@resourceString</span> = <span class="ruby-string">&quot;&quot;</span>
+                <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@tagMatch</span>
+                        <span class="ruby-identifier">resources</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+                                <span class="ruby-keyword">begin</span>
+                                        <span class="ruby-identifier">@@resourceString</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">%Q[\n\t\t#{x}: #{v[1].send( x.to_sym) }]</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">send</span>( <span class="ruby-identifier">x</span>.<span class="ruby-identifier">to_sym</span>) 
+                                <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NoMethodError</span> <span class="ruby-comment"># basically, do nothing</span>
+                                <span class="ruby-keyword">end</span>
+                        } <span class="ruby-comment"># resources.each { |x|</span>
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if @@tagMatch</span>
+
+                <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@resourceString</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&quot;&quot;</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">@@skip</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
+                        <span class="ruby-identifier">@@string</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">%Q[\n\t#{v[0]} ]</span> 
+                        <span class="ruby-identifier">@@string</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">@@resourceString</span>
+                        <span class="ruby-identifier">@@string</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;\n\t\tMatching tags: #{@@tagString.to_s}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">$verbose</span>
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if @@resourceString != &quot;&quot; and @@skip == false</span>
+
+        } <span class="ruby-comment"># aResource.each</span>
+
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">@@string</span> 
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- extract_resource_statuses-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- extract_resource_statuses-method -->
+
+    
+      <div id="method-i-filter_by_time" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">filter_by_time</span><span
+            class="method-args">( fileList, hours=12 )</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Given array of filenames (fileList), and float of hours, Return: [ [files
+within timescope], [files outside of timescope] ]</p>
+          
+
+          
+          <div class="method-source-code" id="filter_by_time-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 70</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_time</span>( <span class="ruby-identifier">fileList</span>, <span class="ruby-identifier">hours</span>=<span class="ruby-value">12</span> )
+        <span class="ruby-identifier">arr</span> = []
+        <span class="ruby-identifier">olderarr</span> = []
+
+        <span class="ruby-identifier">fileList</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+                <span class="ruby-keyword">if</span> (<span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span> <span class="ruby-operator">-</span> (<span class="ruby-identifier">hours</span>*<span class="ruby-value">60</span>*<span class="ruby-value">60</span>)).<span class="ruby-identifier">gmtime</span>.<span class="ruby-identifier">strftime</span>(<span class="ruby-string">&quot;%Y%m%d%H%M&quot;</span>) <span class="ruby-operator">&lt;</span>  <span class="ruby-identifier">f</span>[<span class="ruby-regexp">%r[0-9]{12}.yaml/</span>]
+                        <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">f</span>)
+                <span class="ruby-keyword">else</span> 
+                        <span class="ruby-identifier">olderarr</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">f</span>)
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if (Time.now - (hours*60*60)).gmtime.strftime(&quot;%Y%m%d%H%M&quot;) &lt;  f[/[0-9]{12}.yaml/]</span>
+        } <span class="ruby-comment">#fileList.each { |f|</span>
+
+        <span class="ruby-identifier">arr2</span> = <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">sort</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span>,<span class="ruby-identifier">y</span><span class="ruby-operator">|</span> <span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;=&gt;</span> <span class="ruby-identifier">x</span> } <span class="ruby-comment"># reverse sort puts present on top of past, though this means hostnames are backwards as well. </span>
+
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">arr2</span>,<span class="ruby-identifier">olderarr</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- filter_by_time-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- filter_by_time-method -->
+
+    
+      <div id="method-i-parse_custom_methods" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">parse_custom_methods</span><span
+            class="method-args">(cMParam)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Given customMethods argument, return array of arrays: <code> [
+[method_name, method_arguments] ] </code></p>
+          
+
+          
+          <div class="method-source-code" id="parse_custom_methods-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 373</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">parse_custom_methods</span>(<span class="ruby-identifier">cMParam</span>) 
+        <span class="ruby-ivar">@arr</span> = <span class="ruby-identifier">cMParam</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">','</span>)
+
+        <span class="ruby-ivar">@arr</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">method</span><span class="ruby-operator">|</span>
+                <span class="ruby-ivar">@meth</span> = []
+
+                <span class="ruby-keyword">if</span> <span class="ruby-regexp">%r\s/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">method</span>)
+                        <span class="ruby-ivar">@meth</span>[<span class="ruby-value">0</span>] = <span class="ruby-node">$`</span>
+                        <span class="ruby-ivar">@meth</span>[<span class="ruby-value">1</span>] = <span class="ruby-node">$'</span>
+                <span class="ruby-keyword">else</span> 
+                        <span class="ruby-ivar">@meth</span>[<span class="ruby-value">0</span>] = <span class="ruby-identifier">method</span>
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if /\s/.match(method)</span>
+
+                <span class="ruby-identifier">$customMethods</span>.<span class="ruby-identifier">push</span>(<span class="ruby-ivar">@meth</span>)
+
+        } <span class="ruby-comment"># @arr.each { |method|</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- parse_custom_methods-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- parse_custom_methods-method -->
+
+    
+      <div id="method-i-print_host_changes" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">print_host_changes</span><span
+            class="method-args">( anArr, tagFilter=nil, tagReverseFilter=nil)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Given filelist, read reports, then print matching reports and resources to
+STDOUT</p>
+
+<p><a
+href="http://rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report">rubydoc.info/github/puppetlabs/puppet/master/Puppet/Transaction/Report</a></p>
+          
+
+          
+          <div class="method-source-code" id="print_host_changes-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 276</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">print_host_changes</span>( <span class="ruby-identifier">anArr</span>, <span class="ruby-identifier">tagFilter</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">tagReverseFilter</span>=<span class="ruby-keyword">nil</span>)
+        <span class="ruby-identifier">anArr</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">w</span><span class="ruby-operator">|</span> 
+                <span class="ruby-identifier">v</span> = <span class="ruby-identifier">read_report</span>(<span class="ruby-identifier">w</span>) 
+                <span class="ruby-identifier">string</span> = <span class="ruby-identifier">extract_resource_statuses</span>(<span class="ruby-identifier">v</span>[<span class="ruby-value">:resource_statuses</span>], <span class="ruby-identifier">tagFilter</span>, <span class="ruby-identifier">tagReverseFilter</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>[<span class="ruby-value">:resource_statuses</span>]
+
+                <span class="ruby-identifier">puts</span>(
+                        <span class="ruby-node">%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]</span>
+                ) <span class="ruby-keyword">if</span> ( <span class="ruby-identifier">string</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">string</span>.<span class="ruby-identifier">length</span>() <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> )
+
+        } <span class="ruby-comment"># anArr.each {|w| </span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- print_host_changes-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- print_host_changes-method -->
+
+    
+      <div id="method-i-print_host_logs" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">print_host_logs</span><span
+            class="method-args">( anArr, tagFilter=nil, tagReverseFilter=nil )</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Given filelist, read reports, then print matching logs and  resources to
+STDOUT</p>
+          
+
+          
+          <div class="method-source-code" id="print_host_logs-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 293</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">print_host_logs</span>( <span class="ruby-identifier">anArr</span>, <span class="ruby-identifier">tagFilter</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">tagReverseFilter</span>=<span class="ruby-keyword">nil</span> )
+        <span class="ruby-identifier">anArr</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">w</span><span class="ruby-operator">|</span> 
+                <span class="ruby-identifier">v</span> = <span class="ruby-identifier">read_report</span>(<span class="ruby-identifier">w</span>)
+                <span class="ruby-identifier">string</span> = <span class="ruby-identifier">extract_logs</span>(<span class="ruby-identifier">v</span>[<span class="ruby-value">:logs</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>[<span class="ruby-value">:logs</span>]
+
+                <span class="ruby-identifier">puts</span>(
+                        <span class="ruby-node">%Q[\nReport(#{v[:report_format].to_s}): #{v[:host]}  #{v[:time]} Config:#{v[:configuration_version]}  #{v[:status]}  #{string} ]</span>
+                ) <span class="ruby-keyword">if</span> ( <span class="ruby-identifier">string</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">string</span>.<span class="ruby-identifier">length</span>() <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> ) <span class="ruby-comment">#or (v[:status] == &quot;failed&quot;)</span>
+
+        } <span class="ruby-comment"># anArr.each {|w| </span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- print_host_logs-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- print_host_logs-method -->
+
+    
+      <div id="method-i-process_files" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">process_files</span><span
+            class="method-args">( aDir )</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Recurse through aDir for yaml files, unless it is “zz_archive”.  Return: [
+[filelist], [[directory,last report in directory]] ]</p>
+          
+
+          
+          <div class="method-source-code" id="process_files-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 26</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_files</span>( <span class="ruby-identifier">aDir</span> )
+        <span class="ruby-keyword">unless</span> <span class="ruby-constant">FileTest</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">aDir</span>)
+                <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Error. Invalid input for report directory: #{aDir}.&quot;</span>
+                <span class="ruby-identifier">exit</span>
+        <span class="ruby-keyword">end</span> <span class="ruby-comment"># unless</span>
+
+        <span class="ruby-identifier">@@files</span> = []
+        <span class="ruby-identifier">@@directories</span> = []
+
+        <span class="ruby-comment">##</span>
+        <span class="ruby-comment"># The actual bit that does the recursing through the dir tree</span>
+
+        <span class="ruby-keyword">def</span> <span class="ruby-identifier">process_files_recurse</span>(<span class="ruby-identifier">aDir</span>) 
+                <span class="ruby-identifier">@@tempFiles</span> = []
+
+                <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">foreach</span>( <span class="ruby-identifier">aDir</span> ) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+                        <span class="ruby-identifier">myPath</span> = <span class="ruby-node">&quot;#{aDir}\/#{f}&quot;</span>
+                        <span class="ruby-keyword">if</span> <span class="ruby-constant">FileTest</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">myPath</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">!=</span> <span class="ruby-string">'.'</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">!=</span> <span class="ruby-string">'..'</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">!=</span> <span class="ruby-string">'zz_archive'</span>
+                                 <span class="ruby-identifier">process_files_recurse</span>(<span class="ruby-identifier">myPath</span>)
+                        <span class="ruby-keyword">else</span>
+                                <span class="ruby-identifier">@@tempFiles</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">myPath</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">match</span>(<span class="ruby-regexp">%r\.yaml\Z/</span>)
+                        <span class="ruby-keyword">end</span>
+                } <span class="ruby-comment"># Find.find( aDir ) { |f|</span>
+
+                <span class="ruby-identifier">sortedTempFiles</span> = <span class="ruby-identifier">@@tempFiles</span>.<span class="ruby-identifier">sort</span> 
+                
+                <span class="ruby-identifier">@@files</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">sortedTempFiles</span>)
+                <span class="ruby-identifier">@@directories</span>.<span class="ruby-identifier">push</span>([<span class="ruby-identifier">aDir</span>[<span class="ruby-regexp">%r[^\/]+$/</span>],<span class="ruby-identifier">sortedTempFiles</span>[<span class="ruby-identifier">sortedTempFiles</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>]])
+
+        <span class="ruby-keyword">end</span> <span class="ruby-comment"># def process_files_recurse (aDir) </span>
+
+        <span class="ruby-identifier">process_files_recurse</span>(<span class="ruby-identifier">aDir</span>)
+
+        <span class="ruby-identifier">files</span> = <span class="ruby-identifier">@@files</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">flatten</span>
+        <span class="ruby-identifier">directories</span> = <span class="ruby-identifier">@@directories</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span>(<span class="ruby-identifier">@@directories</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">2</span>)].<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-string">'z'</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">e</span>[<span class="ruby-value">0</span>] } 
+
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">files</span>,<span class="ruby-identifier">directories</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- process_files-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- process_files-method -->
+
+    
+      <div id="method-i-process_files_recurse" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">process_files_recurse</span><span
+            class="method-args">(aDir)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>The actual bit that does the recursing through the dir tree</p>
+          
+
+          
+          <div class="method-source-code" id="process_files_recurse-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 38</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_files_recurse</span>(<span class="ruby-identifier">aDir</span>) 
+        <span class="ruby-identifier">@@tempFiles</span> = []
+
+        <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">foreach</span>( <span class="ruby-identifier">aDir</span> ) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+                <span class="ruby-identifier">myPath</span> = <span class="ruby-node">&quot;#{aDir}\/#{f}&quot;</span>
+                <span class="ruby-keyword">if</span> <span class="ruby-constant">FileTest</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">myPath</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">!=</span> <span class="ruby-string">'.'</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">!=</span> <span class="ruby-string">'..'</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">!=</span> <span class="ruby-string">'zz_archive'</span>
+                         <span class="ruby-identifier">process_files_recurse</span>(<span class="ruby-identifier">myPath</span>)
+                <span class="ruby-keyword">else</span>
+                        <span class="ruby-identifier">@@tempFiles</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">myPath</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">match</span>(<span class="ruby-regexp">%r\.yaml\Z/</span>)
+                <span class="ruby-keyword">end</span>
+        } <span class="ruby-comment"># Find.find( aDir ) { |f|</span>
+
+        <span class="ruby-identifier">sortedTempFiles</span> = <span class="ruby-identifier">@@tempFiles</span>.<span class="ruby-identifier">sort</span> 
+        
+        <span class="ruby-identifier">@@files</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">sortedTempFiles</span>)
+        <span class="ruby-identifier">@@directories</span>.<span class="ruby-identifier">push</span>([<span class="ruby-identifier">aDir</span>[<span class="ruby-regexp">%r[^\/]+$/</span>],<span class="ruby-identifier">sortedTempFiles</span>[<span class="ruby-identifier">sortedTempFiles</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>]])
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- process_files_recurse-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- process_files_recurse-method -->
+
+    
+      <div id="method-i-read_report" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">read_report</span><span
+            class="method-args">( fileList )</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Given an array of files (fileList), Return {report attributes =&gt; value}</p>
+          
+
+          
+          <div class="method-source-code" id="read_report-source">
+            <pre><span class="ruby-comment"># File reportreader.rb, line 93</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">read_report</span>( <span class="ruby-identifier">fileList</span> )
+        <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">fileList</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">g</span><span class="ruby-operator">|</span>
+                <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">g</span>) <span class="ruby-keyword">then</span>
+                                <span class="ruby-identifier">strings</span> = <span class="ruby-node">%W[host time logs metrics resource_statuses configuration_version
+                                        report_format puppet_version kind status pending_count complaint_count
+                                        failed_count]</span>
+                                <span class="ruby-identifier">@@hsh</span> = {}
+
+                                <span class="ruby-identifier">strings</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span>
+                                        <span class="ruby-keyword">begin</span> <span class="ruby-comment"># strings.each rescue block</span>
+                                        <span class="ruby-identifier">@@hsh</span>[<span class="ruby-identifier">string</span>.<span class="ruby-identifier">to_sym</span>] =  <span class="ruby-identifier">b</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">string</span>.<span class="ruby-identifier">to_sym</span>) 
+
+                                        <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NoMethodError</span> <span class="ruby-comment"># basically, do_nothing.</span>
+                                        <span class="ruby-keyword">end</span> <span class="ruby-comment"># strings.each rescue block</span>
+                                } <span class="ruby-comment"># strings.each { |string|</span>
+
+                <span class="ruby-keyword">end</span> <span class="ruby-comment"># if b = YAML.load(g) then</span>
+
+        } <span class="ruby-comment"># File.open(f) { |g|</span>
+
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">@@hsh</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- read_report-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- read_report-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+
