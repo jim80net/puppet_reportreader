@@ -1,4 +1,4 @@
-=[reportreader.rb]
+=reportreader.rb
 This tool was created because a google search for CLI report reader
 returned: nada. reportreader.rb is useful for creating crontabs that i
 report on changes made in a certain time period. I have mine set to 
@@ -6,7 +6,7 @@ report hourly on changes. Eventually, I may come to rely on something
 like Dashboard or Foreman, but for now, this meets my requirements. 
 -----------------------------------------------------------------------
 
-==[Usage]:
+==Usage:
 
     Usage: ./reportreader.rb [options]
       -f, --reportdir PARAM            Identify reports directory (default: /var/lib/puppet/reports)
@@ -23,7 +23,7 @@ like Dashboard or Foreman, but for now, this meets my requirements.
       -h, --help                       Display this screen
 
 
-==[examples]: 
+==examples: 
 
  reportreader.rb -t 4 -c -s all -X '(trunk|augeas)'
 	report changes in the last 4 hours to all nodes excluding resources

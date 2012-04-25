@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 ##
 # :title: reportreader.rb
-# :main: README
+# :main: README.rdoc
 # Use to parse puppet reports. 
 # Sample usage: 
 # reportreader.rb -s all -t 24 -c 
